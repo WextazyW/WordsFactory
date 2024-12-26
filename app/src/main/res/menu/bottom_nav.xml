@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_dictionary"
+        android:icon="@drawable/icon"
+        android:title="Dictionary" />
+    <item
+        android:id="@+id/nav_training"
+        android:icon="@drawable/ph_cards_fill"
+        android:title="Training" />
+    <item
+        android:id="@+id/nav_video"
+        android:icon="@drawable/dashicons_video_alt3"
+        android:title="Video" />
+</menu>
