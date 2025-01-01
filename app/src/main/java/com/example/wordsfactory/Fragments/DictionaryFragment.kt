@@ -1,6 +1,6 @@
 package com.example.wordsfactory.Fragments
 
-import android.content.Context
+import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -8,108 +8,75 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
 import com.example.wordsfactory.R
-import com.example.wordsfactory.databinding.FragmentDictionaryBinding
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import org.json.JSONArray
-import java.io.IOException
-
+import com.example.wordsfactory.ViewModel.DictionaryViewModel
+import com.example.wordsfactory.api.DictionaryApiService
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class DictionaryFragment : Fragment() {
 
-    private lateinit var editTextWord: EditText
-    private lateinit var textViewMeaning: TextView
-    private lateinit var buttonSearch: Button
-    private lateinit var buttonAddToDictionary: Button
-
-    private val client = OkHttpClient()
+    private lateinit var apiService: DictionaryApiService
+    private lateinit var viewModel: DictionaryViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
         val view = inflater.inflate(R.layout.fragment_dictionary, container, false)
 
-        editTextWord = view.findViewById(R.id.editTextWord)
-        textViewMeaning = view.findViewById(R.id.textViewMeaning)
-        buttonSearch = view.findViewById(R.id.buttonSearch)
-        buttonAddToDictionary = view.findViewById(R.id.buttonAddToDictionary)
+        val searchEditText = view.findViewById<EditText>(R.id.searchEditText)
+        val wordTextView = view.findViewById<TextView>(R.id.wordTextView)
+        val phoneticTextView = view.findViewById<TextView>(R.id.phoneticTextView)
+        val partOfSpeechTextView = view.findViewById<TextView>(R.id.partOfSpeechTextView)
+        val meaningsLayout = view.findViewById<LinearLayout>(R.id.meaningsLayout)
+        val addToDictionaryButton = view.findViewById<Button>(R.id.addToDictionaryButton)
+        val searchButton = view.findViewById<Button>(R.id.searchButton)
 
-        buttonSearch.setOnClickListener {
-            val word = editTextWord.text.toString()
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://api.dictionaryapi.dev/api/v2/entries/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        apiService = retrofit.create(DictionaryApiService::class.java)
+        viewModel = ViewModelProvider(this)[DictionaryViewModel::class.java]
+
+        searchButton.setOnClickListener {
+            val word = searchEditText.text.toString()
             if (word.isNotEmpty()) {
-                fetchMeaning(word)
+                viewModel.fetchWordMeaning(apiService, word)
             } else {
-                Toast.makeText(requireContext(), "Введите слово", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Please enter a word", Toast.LENGTH_SHORT).show()
             }
         }
 
-        buttonAddToDictionary.setOnClickListener {
-            saveWord(editTextWord.text.toString(), textViewMeaning.text.toString())
+        viewModel.wordData.observe(viewLifecycleOwner) { wordResponse ->
+            wordTextView.text = wordResponse.word
+            phoneticTextView.text = wordResponse.phonetic ?: ""
+            partOfSpeechTextView.text = "Part of Speech: ${wordResponse.meanings[0].partOfSpeech}"
+
+            meaningsLayout.removeAllViews()
+            wordResponse.meanings.forEach { meaning ->
+                meaning.definitions.forEach { definition ->
+                    val definitionView = TextView(requireContext()).apply {
+                        text = "${definition.definition}\nExample: ${definition.example ?: "No example"}"
+                        textSize = 16f
+                    }
+                    meaningsLayout.addView(definitionView)
+                }
+            }
+        }
+
+        addToDictionaryButton.setOnClickListener {
+            Toast.makeText(requireContext(), "Word added to dictionary", Toast.LENGTH_SHORT).show()
         }
 
         return view
-    }
-
-    private fun fetchMeaning(word: String) {
-        val request = Request.Builder()
-            .url("https://api.dictionaryapi.dev/api/v2/entries/en/$word")
-            .build()
-
-        client.newCall(request).enqueue(object : okhttp3.Callback {
-            override fun onFailure(call: okhttp3.Call, e: IOException) {
-                requireActivity().runOnUiThread {
-                    Toast.makeText(requireContext(), "Ошибка сети", Toast.LENGTH_SHORT).show()
-                }
-            }
-
-            override fun onResponse(call: okhttp3.Call, response: Response) {
-                if (response.isSuccessful) {
-                    val responseData = response.body?.string()
-                    responseData?.let {
-                        parseJson(it)
-                    }
-                }
-            }
-        })
-    }
-
-    private fun parseJson(responseData: String) {
-        try {
-            val jsonArray = JSONArray(responseData)
-            val meanings = StringBuilder()
-
-            for (i in 0 until jsonArray.length()) {
-                val jsonObject = jsonArray.getJSONObject(i)
-                val meaningsArray = jsonObject.getJSONArray("meanings")
-                for (j in 0 until meaningsArray.length()) {
-                    val meaningObject = meaningsArray.getJSONObject(j)
-                    val definitionsArray = meaningObject.getJSONArray("definitions")
-                    for (k in 0 until definitionsArray.length()) {
-                        val definition = definitionsArray.getJSONObject(k)
-                        meanings.append(definition.getString("definition")).append("\n")
-                    }
-                }
-            }
-
-            requireActivity().runOnUiThread {
-                textViewMeaning.text = meanings.toString()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun saveWord(word: String, meaning: String) {
-        val sharedPreferences = requireActivity().getSharedPreferences("dictionary", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.putString(word, meaning)
-        editor.apply()
-        Toast.makeText(requireContext(), "Слово добавлено в словарь", Toast.LENGTH_SHORT).show()
     }
 
 }

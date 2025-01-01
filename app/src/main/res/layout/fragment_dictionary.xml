@@ -1,37 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
+    android:background="@color/white"
     tools:context=".Fragments.DictionaryFragment">
 
-    <EditText
-        android:id="@+id/editTextWord"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Введите слово" />
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <Button
-        android:id="@+id/buttonSearch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Поиск" />
+        <EditText
+            android:id="@+id/searchEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawablePadding="8dp"
+            android:hint="Type a word..."
+            android:drawableEnd="@drawable/ph_cards_fill"
+            android:imeOptions="actionSearch"
+            android:padding="12dp"
+            android:textSize="16sp"
+            tools:ignore="TouchTargetSizeCheck" />
 
-    <TextView
-        android:id="@+id/textViewMeaning"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Значение появится здесь"
-        android:paddingTop="16dp"
-        android:textSize="16sp" />
+        <Button
+            android:id="@+id/searchButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Search" />
 
-    <Button
-        android:id="@+id/buttonAddToDictionary"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Добавить в словарь"
-        android:layout_marginTop="16dp" />
+        <TextView
+            android:id="@+id/wordTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Word will appear here"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"/>
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/phoneticTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="18sp"
+            android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:id="@+id/partOfSpeechTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Part of Speech:"
+            android:textSize="16sp"
+            android:layout_marginTop="16dp"/>
+
+        <TextView
+            android:id="@+id/meaningsLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Meanings:"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:layout_marginTop="16dp"/>
+
+        <LinearLayout
+            android:id="@+id/meaningsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp"/>
+
+        <Button
+            android:id="@+id/addToDictionaryButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add to Dictionary"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:layout_marginTop="24dp"/>
+
+    </LinearLayout>
+
+</ScrollView>
