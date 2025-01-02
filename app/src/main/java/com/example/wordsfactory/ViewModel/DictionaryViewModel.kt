@@ -22,7 +22,7 @@ class DictionaryViewModel : ViewModel() {
             }
 
             override fun onFailure(call: Call<List<WordResponse>>, t: Throwable) {
-                // Handle error
+                // Error
             }
         })
     }

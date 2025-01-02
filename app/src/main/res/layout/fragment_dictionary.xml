@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:drawablePadding="8dp"
             android:hint="Type a word..."
-            android:drawableEnd="@drawable/ph_cards_fill"
+            android:drawableEnd="@drawable/baseline_search_24"
             android:imeOptions="actionSearch"
             android:padding="12dp"
             android:textSize="16sp"
@@ -65,12 +65,12 @@
             android:textSize="18sp"
             android:layout_marginTop="16dp"/>
 
-        <LinearLayout
-            android:id="@+id/meaningsLayout"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/meaningsRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="8dp"/>
+            tools:listitem="@layout/item_meaning"
+            tools:itemCount="6"/>
 
         <Button
             android:id="@+id/addToDictionaryButton"
